@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.util.Locale;
 
 public class AddPerson {
 
@@ -22,30 +23,38 @@ public class AddPerson {
         try {
             Class<?> objectClass = Class.forName(classOf);
             Field[] fields=objectClass.getDeclaredFields();
-            for (Field f:fields) {
-                System.out.println(f);
-            }
-
-            BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
             Class.forName("org.postgresql.Driver");
 
+            String table =classOf.toLowerCase();
             Connection connection = DriverManager.getConnection(URL,LOGIN,PASSWORD);
-            PreparedStatement statement = connection.prepareStatement
-                    ("insert into users (first_name, last_name) values (?, ?)");
+            for (int i = 1, j=0; j < fields.length; i++, j++) {
 
-            String name = (String)fields[0].get(objectClass.cast(object));
-            statement.setString(1, name);
+            String currentFeild = (String)fields[j].getName();
+                String currentFeildContent = (String)fields[j].get(objectClass.cast(object));
 
-            String lastName = (String)fields[1].get(objectClass.cast(object));
-            statement.setString(2, lastName);
+                PreparedStatement statement = getPreparedStatement(table, connection, currentFeild);
+                statement.setString(i,currentFeildContent);
 
             statement.executeUpdate();
+            }
 
             System.out.println("Пользователь добавлен");
 
-        } catch (ClassNotFoundException | SQLException | NullPointerException | ClassCastException | IllegalAccessException e) {
+        } catch (ClassNotFoundException
+                | SQLException
+                | NullPointerException
+                | ClassCastException
+                | IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    private static PreparedStatement getPreparedStatement(String table, Connection connection, String currentFeild) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement
+            ("insert into "+ table +" ("
+                               + currentFeild +
+                                        ") values (?)");
+        return statement;
     }
 }
 
