@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.sql.*;
 
 public class AddPerson {
@@ -10,13 +11,21 @@ public class AddPerson {
         private static final String PASSWORD = "postgres";
     public static void main(String[] args) {
             Person person = new Person();
-            person.setName("Kot");
-            person.setLastName("Kotikov");
-            create(person);
+            String classOf = person.getClass().getName();
+            person.setName("Bob");
+            person.setLastName("Cays");
+            create(person,classOf);
     }
 
-    private static void create(Person person) {
+    private static void create(Object object, String classOf) {
+
         try {
+            Class<?> objectClass = Class.forName(classOf);
+            Field[] fields=objectClass.getDeclaredFields();
+            for (Field f:fields) {
+                System.out.println(f);
+            }
+
             BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
             Class.forName("org.postgresql.Driver");
 
@@ -24,17 +33,17 @@ public class AddPerson {
             PreparedStatement statement = connection.prepareStatement
                     ("insert into users (first_name, last_name) values (?, ?)");
 
-            String name = person.getName();
+            String name = (String)fields[0].get(objectClass.cast(object));
             statement.setString(1, name);
 
-            String lastName = person.getLastName();
+            String lastName = (String)fields[1].get(objectClass.cast(object));
             statement.setString(2, lastName);
 
             statement.executeUpdate();
 
             System.out.println("Пользователь добавлен");
 
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (ClassNotFoundException | SQLException | NullPointerException | ClassCastException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
