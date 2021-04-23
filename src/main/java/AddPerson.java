@@ -8,9 +8,8 @@ public class AddPerson {
         private static final String URL = "jdbc:postgresql://127.0.0.1:5432/postgres";
         private static final String LOGIN = "postgres";
         private static final String PASSWORD = "postgres";
-
     public static void main(String[] args) {
-
+            Person person = new Person();
             try {
                 BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
                 Class.forName("org.postgresql.Driver");
@@ -19,17 +18,17 @@ public class AddPerson {
                 PreparedStatement statement = connection.prepareStatement
                         ("insert into users (first_name, last_name) values (?, ?)");
 
-                System.out.println("Enter author name:");
-                String name = read.readLine();
+                String name = person.getName();
                 statement.setString(1, name);
 
-                System.out.println("Enter author last name:");
-                String lastName = read.readLine();
+                String lastName = person.getLastName();
                 statement.setString(2, lastName);
 
                 statement.executeUpdate();
 
-            } catch (ClassNotFoundException | SQLException | IOException e) {
+                System.out.println("Пользователь добавлен");
+
+            } catch (ClassNotFoundException | SQLException e) {
                 e.printStackTrace();
             }
     }
