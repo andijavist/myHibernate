@@ -7,54 +7,68 @@ import java.util.Locale;
 
 public class AddPerson {
 
-        private static final String URL = "jdbc:postgresql://127.0.0.1:5432/postgres";
-        private static final String LOGIN = "postgres";
-        private static final String PASSWORD = "postgres";
+    private static final String URL = "jdbc:postgresql://127.0.0.1:5432/postgres";
+    private static final String LOGIN = "postgres";
+    private static final String PASSWORD = "postgres";
+
     public static void main(String[] args) {
-            Person person = new Person();
-            String classOf = person.getClass().getName();
-            person.setName("Bob");
-            person.setLastName("Cays");
-            create(person,classOf);
+        Person person = new Person();
+        String classOf = person.getClass().getName();
+        person.setName("Bob");
+        person.setLastName("Cays");
+        create(person, classOf);
     }
 
     private static void create(Object object, String classOf) {
 
         try {
             Class<?> objectClass = Class.forName(classOf);
-            Field[] fields=objectClass.getDeclaredFields();
+            Field[] fields = objectClass.getDeclaredFields();
             Class.forName("org.postgresql.Driver");
+            String table = classOf.toLowerCase();
+            String sqlQery = getSQLQuery(fields,table);
+            System.out.println(sqlQery);
 
-            String table =classOf.toLowerCase();
-            Connection connection = DriverManager.getConnection(URL,LOGIN,PASSWORD);
-            for (int i = 1, j=0; j < fields.length; i++, j++) {
-
-            String currentFeild = (String)fields[j].getName();
-                String currentFeildContent = (String)fields[j].get(objectClass.cast(object));
-
-                PreparedStatement statement = getPreparedStatement(table, connection, currentFeild);
-                statement.setString(i,currentFeildContent);
-
-            statement.executeUpdate();
-            }
-
-            System.out.println("Пользователь добавлен");
+            Connection connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
+            PreparedStatement statement = connection.prepareStatement(getSQLQuery(table, currentFeild));
+//            for (int i = 1, j = 1; j < fields.length; i++, j++) {
+//                currentFeild = (String) fields[j].getName();
+//                currentFeildContent = (String) fields[j].get(objectClass.cast(object));
+//                statement.addBatch();
+//                statement.setString(i, currentFeildContent);
+//            }
+//            statement.executeBatch();
+//
+//            System.out.println("Пользователь добавлен");
 
         } catch (ClassNotFoundException
-                | SQLException
+//                | SQLException
                 | NullPointerException
                 | ClassCastException
-                | IllegalAccessException e) {
+//                | IllegalAccessException
+                e) {
             e.printStackTrace();
         }
     }
 
-    private static PreparedStatement getPreparedStatement(String table, Connection connection, String currentFeild) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement
-            ("insert into "+ table +" ("
-                               + currentFeild +
-                                        ") values (?)");
-        return statement;
+    private static String getSQLQuery(Field[] field, String table) {
+        StringBuffer query = new StringBuffer();
+        query.append("insert into "+table+" (");
+        for (int i = 0; i < field.length; i++) {
+            query.append(field[i].getName());
+            if(i!=field.length-1)
+            query.append(", ");
+        }
+        query.append(") values (");
+        for (int i = 0; i < field.length; i++) {
+            if(i!=field.length-1)
+            query.append("?,");
+            if(i==field.length-1)
+            query.append("?");
+        }
+        query.append(")");
+        query.toString();
+        return query.toString();
     }
 }
 
