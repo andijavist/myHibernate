@@ -36,9 +36,9 @@ public class AddPerson {
                 currentFieldContent = (String) fields[j].get(objectClass.cast(object));
                 System.out.println(currentFieldContent);
                 statement.setString(i, currentFieldContent);
-//                statement.addBatch();
+//                TODO statement.addBatch();
             }
-//            statement.executeBatch();
+//            TODO statement.executeBatch();
             statement.executeUpdate();
             System.out.println("Пользователь добавлен");
 
