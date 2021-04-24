@@ -23,29 +23,30 @@ public class AddPerson {
 
         try {
             Class<?> objectClass = Class.forName(classOf);
-            Field[] fields = objectClass.getDeclaredFields();
             Class.forName("org.postgresql.Driver");
-            String table = classOf.toLowerCase();
-            String sqlQery = getSQLQuery(fields,table);
-            System.out.println(sqlQery);
-
             Connection connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
-            PreparedStatement statement = connection.prepareStatement(getSQLQuery(table, currentFeild));
-//            for (int i = 1, j = 1; j < fields.length; i++, j++) {
-//                currentFeild = (String) fields[j].getName();
-//                currentFeildContent = (String) fields[j].get(objectClass.cast(object));
+
+            Field[] fields = objectClass.getDeclaredFields();
+            String table = classOf.toLowerCase();
+            String sqlQuery = getSQLQuery(fields, table);
+            System.out.println(sqlQuery);
+            PreparedStatement statement = connection.prepareStatement(sqlQuery);
+            String currentFieldContent;
+            for (int i = 1, j = 0; j < fields.length; i++, j++) {
+                currentFieldContent = (String) fields[j].get(objectClass.cast(object));
+                System.out.println(currentFieldContent);
+                statement.setString(i, currentFieldContent);
 //                statement.addBatch();
-//                statement.setString(i, currentFeildContent);
-//            }
+            }
 //            statement.executeBatch();
-//
-//            System.out.println("Пользователь добавлен");
+            statement.executeUpdate();
+            System.out.println("Пользователь добавлен");
 
         } catch (ClassNotFoundException
-//                | SQLException
+                | SQLException
                 | NullPointerException
                 | ClassCastException
-//                | IllegalAccessException
+                | IllegalAccessException
                 e) {
             e.printStackTrace();
         }
@@ -53,18 +54,18 @@ public class AddPerson {
 
     private static String getSQLQuery(Field[] field, String table) {
         StringBuffer query = new StringBuffer();
-        query.append("insert into "+table+" (");
+        query.append("insert into " + table + " (");
         for (int i = 0; i < field.length; i++) {
-            query.append(field[i].getName());
-            if(i!=field.length-1)
-            query.append(", ");
+            query.append(field[i].getName().toLowerCase());
+            if (i != field.length - 1)
+                query.append(", ");
         }
         query.append(") values (");
         for (int i = 0; i < field.length; i++) {
-            if(i!=field.length-1)
-            query.append("?,");
-            if(i==field.length-1)
-            query.append("?");
+            if (i != field.length - 1)
+                query.append("?,");
+            if (i == field.length - 1)
+                query.append("?");
         }
         query.append(")");
         query.toString();
