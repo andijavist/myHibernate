@@ -41,7 +41,6 @@ public class AddPerson {
             System.out.println("Пользователь добавлен");
 
 
-
         } catch (ClassNotFoundException
                 | SQLException
                 | NullPointerException

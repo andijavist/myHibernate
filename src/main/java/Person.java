@@ -1,7 +1,4 @@
-import jdk.jfr.Threshold;
-
 import java.util.Objects;
-@Threshold
 @NameTable(name = "person")
 public class Person {
     String name = "Stepan";
