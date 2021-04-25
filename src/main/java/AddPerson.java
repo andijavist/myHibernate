@@ -17,6 +17,8 @@ public class AddPerson {
 
     private static void create(Object object, String classOf) {
 
+            String currentFieldContent;
+
         try {
             Class<?> objectClass = Class.forName(classOf);
             Class.forName("org.postgresql.Driver");
@@ -24,11 +26,13 @@ public class AddPerson {
 
             Field[] fields = objectClass.getDeclaredFields();
             String table = objectClass.getAnnotation(NameTable.class).name();
+            //creating table
+            createTable(connection, fields, table);
+            //making sql query
             String sqlQuery = getSQLQuery(fields, table);
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
-            String currentFieldContent;
+            //inserting data into table
             for (int i = 1, j = 0; j < fields.length; i++, j++) {
-
                 currentFieldContent = (String) fields[j].get(objectClass.cast(object));
                 statement.setString(i, currentFieldContent);
 //                TODO statement.addBatch();
@@ -37,13 +41,36 @@ public class AddPerson {
             statement.executeUpdate();
             System.out.println("Пользователь добавлен");
 
-
         } catch (ClassNotFoundException
                 | SQLException
                 | NullPointerException
                 | ClassCastException
                 | IllegalAccessException
                 e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void createTable(Connection connection, Field[] field, String table){
+        try {
+            Statement statement = connection.createStatement();
+            StringBuffer query = new StringBuffer();
+            query.append("CREATE TABLE " + table + " (id serial not NULL, ");
+    //TODO table exist
+            //example
+//            String SQL = "CREATE TABLE developers " +
+//                    "(id INTEGER not NULL, " +
+//                    " name VARCHAR(50), " +
+//                    " specialty VARCHAR (50), " +
+//                    " salary INTEGER not NULL, " +
+//                    " PRIMARY KEY (id))";
+            for (int i = 0; i < field.length; i++)
+                    query.append(field[i].getAnnotation(NameColumn.class).name()+" text,");
+            query.append(" PRIMARY KEY (id))");
+            statement.executeUpdate(query.toString());
+
+        }
+        catch(SQLException e){
             e.printStackTrace();
         }
     }

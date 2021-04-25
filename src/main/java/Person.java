@@ -1,5 +1,5 @@
 import java.util.Objects;
-@NameTable(name = "person")
+@NameTable(name = "users")
 public class Person {
     @NameColumn(name = "name")
     String personName = "Stepan";
