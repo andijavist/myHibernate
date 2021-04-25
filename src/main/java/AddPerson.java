@@ -14,8 +14,8 @@ public class AddPerson {
     public static void main(String[] args) {
         Person person = new Person();
         String classOf = person.getClass().getName();
-        person.setName("Bob");
-        person.setLastName("Cays");
+        person.setName("Viktor");
+        person.setLastName("Bodrov");
         create(person, classOf);
     }
 
@@ -27,20 +27,20 @@ public class AddPerson {
             Connection connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
 
             Field[] fields = objectClass.getDeclaredFields();
-            String table = classOf.toLowerCase();
+            String table = objectClass.getAnnotation(NameTable.class).name();
             String sqlQuery = getSQLQuery(fields, table);
-            System.out.println(sqlQuery);
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             String currentFieldContent;
             for (int i = 1, j = 0; j < fields.length; i++, j++) {
                 currentFieldContent = (String) fields[j].get(objectClass.cast(object));
-                System.out.println(currentFieldContent);
                 statement.setString(i, currentFieldContent);
 //                TODO statement.addBatch();
             }
 //            TODO statement.executeBatch();
             statement.executeUpdate();
             System.out.println("Пользователь добавлен");
+
+
 
         } catch (ClassNotFoundException
                 | SQLException
