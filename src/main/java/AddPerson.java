@@ -1,9 +1,5 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.sql.*;
-import java.util.Locale;
 
 public class AddPerson {
 
@@ -14,8 +10,8 @@ public class AddPerson {
     public static void main(String[] args) {
         Person person = new Person();
         String classOf = person.getClass().getName();
-        person.setName("Viktor");
-        person.setLastName("Bodrov");
+        person.setPersonName("Gerasim");
+        person.setPersonLastName("Bredpitov");
         create(person, classOf);
     }
 
@@ -32,6 +28,7 @@ public class AddPerson {
             PreparedStatement statement = connection.prepareStatement(sqlQuery);
             String currentFieldContent;
             for (int i = 1, j = 0; j < fields.length; i++, j++) {
+
                 currentFieldContent = (String) fields[j].get(objectClass.cast(object));
                 statement.setString(i, currentFieldContent);
 //                TODO statement.addBatch();
@@ -55,7 +52,8 @@ public class AddPerson {
         StringBuffer query = new StringBuffer();
         query.append("insert into " + table + " (");
         for (int i = 0; i < field.length; i++) {
-            query.append(field[i].getName().toLowerCase());
+            //TODO else+analyze Register
+            query.append(field[i].getAnnotation(NameColumn.class).name());
             if (i != field.length - 1)
                 query.append(", ");
         }

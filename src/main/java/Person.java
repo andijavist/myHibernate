@@ -1,23 +1,25 @@
 import java.util.Objects;
 @NameTable(name = "person")
 public class Person {
-    String name = "Stepan";
-    String lastName = "Stepanov";
+    @NameColumn(name = "name")
+    String personName = "Stepan";
+    @NameColumn(name = "lastName")
+    String personLastName = "Stepanov";
 
-    public String getName() {
-        return name;
+    public String getPersonName() {
+        return personName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setPersonName(String personName) {
+        this.personName = personName;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getPersonLastName() {
+        return personLastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setPersonLastName(String personLastName) {
+        this.personLastName = personLastName;
     }
 
     @Override
@@ -25,11 +27,11 @@ public class Person {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        return Objects.equals(name, person.name) && Objects.equals(lastName, person.lastName);
+        return Objects.equals(personName, person.personName) && Objects.equals(personLastName, person.personLastName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, lastName);
+        return Objects.hash(personName, personLastName);
     }
 }
